@@ -24,7 +24,8 @@ def get_cuda_info() -> dict:
         if torch.cuda.is_available():
             idx = torch.cuda.current_device()
             name = torch.cuda.get_device_name(idx)
-            vram_bytes = torch.cuda.get_device_properties(idx).total_mem
+            props = torch.cuda.get_device_properties(idx)
+            vram_bytes = getattr(props, "total_memory", None) or props.total_mem
             vram_gb = vram_bytes / (1024**3)
             return {
                 "available": True,

@@ -60,7 +60,7 @@ CSVs → Spark batch ETL (Docker, laptop) → Parquet splits + stream holdout
 ## Phase status
 - [x] P0 Bootstrap (profiles, contracts, infra)
 - [x] P1 Spark ETL (full run on laptop)
-- [ ] P2 Centralized baselines + ONNX (code + laptop smoke)
+- [x] P2 Centralized baselines + ONNX (code + laptop smoke)
 - [ ] P3 Federated engine (code + laptop smoke)
 - [ ] PL1 Lab migration tooling
 - [ ] — LAB SESSION 1 (manual, docs/lab_runbook.md)

@@ -12,10 +12,9 @@ xgb:
   max_depth: 8
   learning_rate: 0.1
   early_stopping_rounds: 20
-  tree_method: gpu_hist
 
 mlp:
-  hidden_dims: [512, 256, 128]
+  hidden_dims: [256, 128, 64]
   dropout: 0.3
 
 mlflow:

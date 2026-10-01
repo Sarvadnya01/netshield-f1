@@ -1,0 +1,113 @@
+{
+  "run_name": "mlp_smoke",
+  "model_type": "mlp",
+  "profile": "laptop",
+  "drop_features": [],
+  "feature_names": [
+    "ack_count",
+    "ack_flag_number",
+    "arp",
+    "avg",
+    "covariance",
+    "cwr_flag_number",
+    "dhcp",
+    "dns",
+    "drate",
+    "duration",
+    "ece_flag_number",
+    "fin_flag_number",
+    "flow_duration",
+    "header_length",
+    "http",
+    "https",
+    "iat",
+    "icmp",
+    "ipv",
+    "irc",
+    "llc",
+    "magnitude",
+    "max",
+    "min",
+    "number",
+    "protocol_type",
+    "psh_flag_number",
+    "radius",
+    "rate",
+    "recon_count",
+    "rst_flag_number",
+    "smtp",
+    "srate",
+    "ssh",
+    "std",
+    "syn_flag_number",
+    "tcp",
+    "telnet",
+    "tot_size",
+    "tot_sum",
+    "udp",
+    "uploading",
+    "variance",
+    "web_count",
+    "weight",
+    "xss_count"
+  ],
+  "train_rows": 40000,
+  "input_dim": 46,
+  "seed": 42,
+  "wall_time_s": 3.6,
+  "test_metrics": {
+    "accuracy": 0.122125,
+    "macro_f1": 0.10009288942185252,
+    "weighted_f1": 0.10009288942185252,
+    "per_class": {
+      "Benign": {
+        "precision": 0.1206896551724138,
+        "recall": 0.021,
+        "f1": 0.03577512776831346,
+        "support": 1000
+      },
+      "DDoS": {
+        "precision": 0.10191082802547771,
+        "recall": 0.064,
+        "f1": 0.07862407862407862,
+        "support": 1000
+      },
+      "DoS": {
+        "precision": 0.13097072419106318,
+        "recall": 0.17,
+        "f1": 0.14795474325500435,
+        "support": 1000
+      },
+      "Mirai": {
+        "precision": 0.11682419659735349,
+        "recall": 0.309,
+        "f1": 0.16954732510288065,
+        "support": 1000
+      },
+      "Recon": {
+        "precision": 0.17543859649122806,
+        "recall": 0.04,
+        "f1": 0.06514657980456026,
+        "support": 1000
+      },
+      "Spoofing": {
+        "precision": 0.12423979148566464,
+        "recall": 0.143,
+        "f1": 0.13296141329614133,
+        "support": 1000
+      },
+      "Web": {
+        "precision": 0.08955223880597014,
+        "recall": 0.006,
+        "f1": 0.011246485473289597,
+        "support": 1000
+      },
+      "BruteForce": {
+        "precision": 0.1238253178551686,
+        "recall": 0.224,
+        "f1": 0.1594873620505518,
+        "support": 1000
+      }
+    }
+  }
+}
