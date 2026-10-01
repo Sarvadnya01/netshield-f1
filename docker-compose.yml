@@ -1,0 +1,135 @@
+services:
+  kafka:
+    image: apache/kafka:3.9.1
+    container_name: netshield-kafka
+    environment:
+      # KRaft mode (no ZooKeeper)
+      KAFKA_NODE_ID: "1"
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      # Dual listeners: INTERNAL for containers, EXTERNAL for host
+      KAFKA_LISTENERS: INTERNAL://0.0.0.0:9092,EXTERNAL://0.0.0.0:9094,CONTROLLER://0.0.0.0:9093
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka:9092,EXTERNAL://localhost:9094
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT,CONTROLLER:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: "1"
+      KAFKA_LOG_RETENTION_HOURS: "24"
+      KAFKA_HEAP_OPTS: "-Xmx512m -Xms256m"
+      CLUSTER_ID: "netshield-fl-kafka-cluster-01"
+    ports:
+      - "9094:9094"
+    healthcheck:
+      test: /opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --list || exit 1
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    mem_limit: 1g
+    restart: unless-stopped
+
+  kafka-init:
+    image: apache/kafka:3.9.1
+    container_name: netshield-kafka-init
+    depends_on:
+      kafka:
+        condition: service_healthy
+    entrypoint: /bin/bash
+    command: |
+      -c '
+      KAFKA=/opt/kafka/bin/kafka-topics.sh
+      BROKER=kafka:9092
+      for TOPIC in iot.flows iot.alerts iot.metrics iot.control; do
+        $$KAFKA --bootstrap-server $$BROKER --create --if-not-exists \
+          --topic $$TOPIC --partitions 3 --replication-factor 1
+        echo "Created topic: $$TOPIC"
+      done
+      echo "All topics created."
+      '
+    restart: "no"
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: netshield-kafka-ui
+    profiles: [tools]
+    depends_on:
+      kafka:
+        condition: service_healthy
+    environment:
+      KAFKA_CLUSTERS_0_NAME: netshield
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
+    ports:
+      - "8080:8080"
+    mem_limit: 512m
+
+  spark-etl:
+    build:
+      context: .
+      dockerfile: docker/spark/Dockerfile
+    container_name: netshield-spark-etl
+    profiles: [etl]
+    volumes:
+      - .:/workspace
+      - spark-tmp:/tmp/spark
+    environment:
+      NETSHIELD_PROFILE: ${NETSHIELD_PROFILE:-laptop}
+      SPARK_LOCAL_DIR: /tmp/spark
+    working_dir: /workspace
+    command: python -m netshield.etl.run_etl
+    mem_limit: 6g
+
+  spark-stream:
+    build:
+      context: .
+      dockerfile: docker/spark/Dockerfile
+    container_name: netshield-spark-stream
+    profiles: [stream]
+    depends_on:
+      kafka:
+        condition: service_healthy
+    volumes:
+      - .:/workspace
+      - spark-tmp:/tmp/spark
+    environment:
+      NETSHIELD_PROFILE: ${NETSHIELD_PROFILE:-laptop}
+      KAFKA_BOOTSTRAP: kafka:9092
+      SPARK_LOCAL_DIR: /tmp/spark
+    working_dir: /workspace
+    command: python -m netshield.streaming.spark_inference
+    mem_limit: 3g
+
+  api:
+    build:
+      context: .
+      dockerfile: docker/api/Dockerfile
+    container_name: netshield-api
+    profiles: [app]
+    depends_on:
+      kafka:
+        condition: service_healthy
+    environment:
+      NETSHIELD_PROFILE: ${NETSHIELD_PROFILE:-laptop}
+      KAFKA_BOOTSTRAP: kafka:9092
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./models/serving:/app/models/serving:ro
+      - ./configs:/app/configs:ro
+    mem_limit: 512m
+
+  dashboard:
+    build:
+      context: .
+      dockerfile: docker/dashboard/Dockerfile
+    container_name: netshield-dashboard
+    profiles: [app]
+    depends_on:
+      - api
+    environment:
+      NETSHIELD_PROFILE: ${NETSHIELD_PROFILE:-laptop}
+    ports:
+      - "8501:8501"
+    mem_limit: 512m
+
+volumes:
+  spark-tmp:

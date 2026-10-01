@@ -1,0 +1,49 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Virtual environment
+.venv/
+venv/
+
+# Data (large files)
+data/
+
+# Transfer bundles
+transfer/
+
+# Logs
+logs/
+*.log
+
+# MLflow
+mlruns/
+*.db
+
+# Checkpoints
+checkpoints/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Env
+.env
+
+# Keep .gitkeep files
+!**/.gitkeep
+
+# Allow models/serving ONNX and JSON
+!models/serving/*.onnx
+!models/serving/*.json
+!models/serving/.gitkeep

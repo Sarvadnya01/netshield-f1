@@ -1,0 +1,25 @@
+spark:
+  driver_memory: 16g
+  master: "local[16]"
+  shuffle_partitions: 800
+
+training:
+  train_max_rows: null
+  batch_size: 8192
+  max_epochs: 30
+  early_stopping_patience: 5
+  data_on_gpu: true
+
+xgb:
+  n_estimators: 2000
+  early_stopping_rounds: 50
+
+fl:
+  rounds: 50
+  seeds: [42, 43]
+  alphas: [0.1, 0.5, "iid"]
+  methods: [local_only, fedavg, fedprox]
+  mus: [0.01, 0.1]
+
+mlflow:
+  tracking_uri: "sqlite:///mlflow.db"

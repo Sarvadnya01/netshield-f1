@@ -1,0 +1,21 @@
+data:
+  raw_dir: data/raw/ciciot2023
+  processed_dir: data/processed
+  partitions_dir: data/partitions
+  stream_dir: data/stream
+  serving_dir: models/serving
+
+  # Per-class cap applied during ETL (null = no cap)
+  class_cap: null
+
+  # Train / val / test split fractions
+  split:
+    train: 0.7
+    val: 0.15
+    test: 0.15
+
+  # Stream holdout fraction (taken before train/val/test split)
+  stream_holdout: 0.05
+
+  # Feature stats file for preprocessing
+  feature_stats: models/serving/feature_stats.json

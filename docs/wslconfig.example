@@ -1,0 +1,7 @@
+# Save this as %UserProfile%\.wslconfig and restart WSL.
+# Caps WSL2 memory so Docker Desktop stays within budget.
+
+[wsl2]
+memory=8GB
+processors=8
+swap=8GB

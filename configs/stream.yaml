@@ -1,0 +1,26 @@
+kafka:
+  bootstrap_servers: localhost:9094
+  topics:
+    flows: iot.flows
+    alerts: iot.alerts
+    metrics: iot.metrics
+    control: iot.control
+
+streaming:
+  checkpoint_dir: checkpoints/streaming
+  trigger_interval: "5 seconds"
+  watermark_delay: "10 seconds"
+  metrics_window: "30 seconds"
+
+producer:
+  rate_eps: 500
+  batch_size: 100
+
+api:
+  host: "0.0.0.0"
+  port: 8000
+  cors_origins: ["http://localhost:8501"]
+
+dashboard:
+  api_url: "http://localhost:8000"
+  refresh_interval_s: 5

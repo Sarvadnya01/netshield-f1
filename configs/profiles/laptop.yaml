@@ -1,0 +1,23 @@
+spark:
+  driver_memory: 5g
+  master: "local[6]"
+  shuffle_partitions: 400
+
+training:
+  train_max_rows: 300000
+  batch_size: 2048
+  max_epochs: 3
+  data_on_gpu: auto
+
+xgb:
+  n_estimators: 200
+
+fl:
+  rounds: 5
+  seeds: [42]
+  alphas: [0.5]
+  methods: [fedavg, fedprox]
+  mus: [0.01]
+
+mlflow:
+  tracking_uri: "sqlite:///mlflow_laptop.db"
