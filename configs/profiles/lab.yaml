@@ -20,6 +20,8 @@ fl:
   alphas: [0.1, 0.5, "iid"]
   methods: [local_only, fedavg, fedprox]
   mus: [0.01, 0.1]
+  local_epochs: 3
+  local_batch_size: 4096
 
 mlflow:
   tracking_uri: "sqlite:///mlflow.db"

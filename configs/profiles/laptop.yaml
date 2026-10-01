@@ -13,11 +13,14 @@ xgb:
   n_estimators: 200
 
 fl:
-  rounds: 5
+  num_clients: 4
+  rounds: 3
   seeds: [42]
   alphas: [0.5]
   methods: [fedavg, fedprox]
   mus: [0.01]
+  local_epochs: 1
+  local_batch_size: 1024
 
 mlflow:
   tracking_uri: "sqlite:///mlflow_laptop.db"

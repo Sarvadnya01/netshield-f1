@@ -1,5 +1,5 @@
 fl:
-  num_clients: 5
+  num_clients: 8
   rounds: 20
   fraction_fit: 1.0
   seeds: [42]
@@ -9,3 +9,6 @@ fl:
   local_epochs: 3
   local_lr: 0.001
   local_batch_size: 2048
+  checkpoint_every: 5
+  min_samples_per_client: 50
+  local_val_fraction: 0.1
