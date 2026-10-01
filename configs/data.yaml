@@ -1,6 +1,7 @@
 data:
   raw_dir: data/raw/ciciot2023
   processed_dir: data/processed
+  interim_dir: data/interim
   partitions_dir: data/partitions
   stream_dir: data/stream
   serving_dir: models/serving
@@ -8,14 +9,22 @@ data:
   # Per-class cap applied during ETL (null = no cap)
   class_cap: null
 
-  # Train / val / test split fractions
+  # Split fractions (applied after stream holdout)
   split:
-    train: 0.7
-    val: 0.15
-    test: 0.15
+    stream_fraction: 0.03
+    train: 0.8
+    val: 0.1
+    test: 0.1
 
-  # Stream holdout fraction (taken before train/val/test split)
-  stream_holdout: 0.05
+  # Cap training rows per class (null = no cap, keep all of rarer classes)
+  train_cap_per_class: 300000
+
+  # Total cap for val and test sets (null = no cap)
+  val_test_total_cap: 1000000
 
   # Feature stats file for preprocessing
   feature_stats: models/serving/feature_stats.json
+
+etl:
+  dedupe_scope: global   # "global" (dropDuplicates) or "per_file" (cheaper fallback)
+  seed: 42

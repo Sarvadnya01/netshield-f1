@@ -74,6 +74,7 @@ services:
     environment:
       NETSHIELD_PROFILE: ${NETSHIELD_PROFILE:-laptop}
       SPARK_LOCAL_DIR: /tmp/spark
+      PYTHONPATH: /workspace/src
     working_dir: /workspace
     command: python -m netshield.etl.run_etl
     mem_limit: 6g
@@ -94,6 +95,7 @@ services:
       NETSHIELD_PROFILE: ${NETSHIELD_PROFILE:-laptop}
       KAFKA_BOOTSTRAP: kafka:9092
       SPARK_LOCAL_DIR: /tmp/spark
+      PYTHONPATH: /workspace/src
     working_dir: /workspace
     command: python -m netshield.streaming.spark_inference
     mem_limit: 3g
