@@ -64,7 +64,7 @@ CSVs → Spark batch ETL (Docker, laptop) → Parquet splits + stream holdout
 - [x] P3 Federated engine (code + laptop smoke)
 - [x] PL1 Lab migration tooling
 - [ ] — LAB SESSION 1 (manual, docs/lab_runbook.md)
-- [ ] P4 Kafka + Spark Structured Streaming
+- [x] P4 Kafka + Spark Structured Streaming
 - [ ] P5A FastAPI
 - [ ] P5B Streamlit dashboard
 - [ ] PL2 Integrate lab results

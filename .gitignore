@@ -27,6 +27,9 @@ mlruns/
 # Checkpoints
 checkpoints/
 
+# Claude Code
+.claude/
+
 # IDE
 .vscode/
 .idea/
