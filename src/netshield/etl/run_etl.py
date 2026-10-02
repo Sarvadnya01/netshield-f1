@@ -147,8 +147,8 @@ def main() -> None:
         t0 = time.time()
         logger.info("Stage ingest_clean: STARTING")
 
-        from netshield.etl.ingest import ingest
         from netshield.etl.clean import clean
+        from netshield.etl.ingest import ingest
 
         df_raw = ingest(spark, max_files=args.max_files)
         count_raw = df_raw.count()

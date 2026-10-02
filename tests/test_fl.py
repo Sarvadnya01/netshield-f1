@@ -2,10 +2,8 @@
 
 from __future__ import annotations
 
-import json
 import tempfile
 from pathlib import Path
-from unittest.mock import patch
 
 import numpy as np
 import pytest
@@ -52,9 +50,9 @@ def test_weighted_aggregate_single_client():
 
 def test_fedprox_mu0_equals_fedavg():
     """FedProx with mu=0 should produce identical results to FedAvg."""
+    from netshield.common.labels import NUM_CLASSES
     from netshield.federated.client import FLClient
     from netshield.models.mlp import MLP
-    from netshield.common.labels import NUM_CLASSES
 
     np.random.seed(42)
     torch.manual_seed(42)
@@ -146,7 +144,7 @@ def test_partition_deterministic():
 
 def test_resume_checkpoint():
     """After checkpointing, resuming should yield the same total history length."""
-    from netshield.federated.server import _save_checkpoint, _load_checkpoint
+    from netshield.federated.server import _load_checkpoint, _save_checkpoint
 
     with tempfile.TemporaryDirectory() as tmpdir:
         ckpt_dir = Path(tmpdir) / "test_ckpt"

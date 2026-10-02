@@ -18,7 +18,7 @@ torch = pytest.importorskip("torch")
 
 def test_score_batch_basic():
     """score_batch should produce correct alert fields from a small DataFrame."""
-    ort = pytest.importorskip("onnxruntime")
+    pytest.importorskip("onnxruntime")
     from netshield.common.labels import CLASS_NAMES, NUM_CLASSES
     from netshield.models.mlp import MLP
     from netshield.streaming.score import score_batch
@@ -138,8 +138,9 @@ def test_burst_expires():
 
 def test_token_bucket_rate():
     """TokenBucket should respect approximate rate."""
-    from netshield.streaming.producer import TokenBucket
     import time
+
+    from netshield.streaming.producer import TokenBucket
 
     bucket = TokenBucket(rate=1000)
     count = 0
@@ -154,8 +155,9 @@ def test_token_bucket_rate():
 
 def test_producer_control_handler():
     """_handle_control should create and remove bursts."""
+    from unittest.mock import patch
+
     from netshield.streaming.producer import StreamProducer
-    from unittest.mock import patch, MagicMock
 
     # Patch everything the constructor needs
     with patch("netshield.streaming.producer.get_config") as mock_cfg, \

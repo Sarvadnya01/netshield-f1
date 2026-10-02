@@ -41,7 +41,9 @@ def live_summary() -> dict | None:
     return _get("/live/summary")
 
 
-def live_alerts(limit: int = 50, only_attacks: bool = False, org_id: str | None = None) -> list | None:
+def live_alerts(
+    limit: int = 50, only_attacks: bool = False, org_id: str | None = None,
+) -> list | None:
     params: dict[str, Any] = {"limit": limit, "only_attacks": only_attacks}
     if org_id:
         params["org_id"] = org_id
@@ -52,7 +54,9 @@ def live_orgs() -> list | None:
     return _get("/live/orgs")
 
 
-def control_inject(org_id: str, attack_class: str, rate_eps: float, duration_s: float) -> dict | None:
+def control_inject(
+    org_id: str, attack_class: str, rate_eps: float, duration_s: float,
+) -> dict | None:
     return _post("/control/inject", {
         "command": "inject",
         "org_id": org_id,

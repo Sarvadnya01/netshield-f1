@@ -12,7 +12,12 @@ st.set_page_config(
 )
 
 # Page imports (deferred to avoid circular)
-from netshield.dashboard.pages import live_soc, federated_lab, experiments, architecture  # noqa: E402
+from netshield.dashboard.pages import (  # noqa: E402
+    architecture,
+    experiments,
+    federated_lab,
+    live_soc,
+)
 
 PAGES = {
     "Live SOC": live_soc,

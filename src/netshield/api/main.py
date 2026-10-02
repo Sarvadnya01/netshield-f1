@@ -14,13 +14,14 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from netshield.api.kafka_consumers import (
     KafkaAlertConsumer,
+    KafkaFlowScorer,
     KafkaMetricsConsumer,
     MockGenerator,
     is_mock_mode,
+    scoring_mode,
 )
 from netshield.api.state import LiveState, ModelState
 from netshield.common.config import get_config, repo_root
-from netshield.common.labels import CLASS_NAMES
 from netshield.common.schemas import ControlEvent, FlowEvent
 
 logger = logging.getLogger(__name__)
@@ -66,13 +67,27 @@ async def lifespan(app: FastAPI):
         topics = cfg.get("kafka", {}).get("topics", {})
         alerts_topic = topics.get("alerts", "iot.alerts")
         metrics_topic = topics.get("metrics", "iot.metrics")
+        flows_topic = topics.get("flows", "iot.flows")
+        mode = scoring_mode()
 
-        alert_consumer = KafkaAlertConsumer(_live, bootstrap, alerts_topic)
+        if mode == "api":
+            # Fallback: API scores iot.flows directly (no Spark needed)
+            scorer = KafkaFlowScorer(
+                _live, _model, bootstrap, flows_topic, alerts_topic
+            )
+            scorer.start()
+            _consumers.append(scorer)
+            logger.info("API-mode scoring started (bypass Spark)")
+        else:
+            # Normal: consume iot.alerts produced by Spark streaming
+            alert_consumer = KafkaAlertConsumer(_live, bootstrap, alerts_topic)
+            alert_consumer.start()
+            _consumers.append(alert_consumer)
+
         metrics_consumer = KafkaMetricsConsumer(_live, bootstrap, metrics_topic)
-        alert_consumer.start()
         metrics_consumer.start()
-        _consumers.extend([alert_consumer, metrics_consumer])
-        logger.info("Kafka consumers started (bootstrap=%s)", bootstrap)
+        _consumers.append(metrics_consumer)
+        logger.info("Kafka consumers started (bootstrap=%s, scoring=%s)", bootstrap, mode)
 
     yield
 
@@ -105,6 +120,7 @@ def health():
     return {
         "status": "ok",
         "mock_mode": is_mock_mode(),
+        "scoring_mode": scoring_mode(),
         "model_loaded": model.onnx_session is not None,
         "model_version": model.model_version,
     }

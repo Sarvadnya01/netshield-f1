@@ -67,7 +67,7 @@ def test_mlp_get_set_weights():
 
 def test_onnx_parity_random():
     """Export a small MLP to ONNX and verify parity with PyTorch."""
-    onnx = pytest.importorskip("onnx")
+    pytest.importorskip("onnx")
     ort = pytest.importorskip("onnxruntime")
     from netshield.models.mlp import MLP
 

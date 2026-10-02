@@ -2,11 +2,8 @@
 
 from __future__ import annotations
 
-import json
 import os
 import time
-from pathlib import Path
-from unittest.mock import patch
 
 import pytest
 
@@ -22,6 +19,7 @@ def client():
     """Create a TestClient with mock mode enabled."""
     os.environ["MOCK_MODE"] = "1"
     from fastapi.testclient import TestClient
+
     from netshield.api.main import app
     with TestClient(app) as c:
         yield c
@@ -195,8 +193,6 @@ def test_model_hot_reload(client, tmp_path):
 
     # Touch active.json to change mtime
     active_path = model._active_path
-    original_mtime = active_path.stat().st_mtime
-
     # Write same content but with new timestamp
     content = active_path.read_text()
     time.sleep(0.05)  # Ensure mtime changes

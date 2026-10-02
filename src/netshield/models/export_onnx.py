@@ -10,7 +10,6 @@ from __future__ import annotations
 import argparse
 import json
 import logging
-import time
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -38,6 +37,7 @@ def export_mlp_onnx(
         Path to the exported .onnx file.
     """
     import torch
+
     from netshield.models.mlp import MLP
 
     root = repo_root()
@@ -93,6 +93,7 @@ def verify_parity(
     """
     import onnxruntime as ort
     import torch
+
     from netshield.models.mlp import MLP
 
     root = repo_root()
@@ -143,6 +144,7 @@ def benchmark_ort(
 ) -> dict[str, float]:
     """Benchmark ONNX Runtime CPU latency."""
     import onnxruntime as ort
+
     from netshield.models.evaluate import measure_inference_latency
 
     if batch_sizes is None:

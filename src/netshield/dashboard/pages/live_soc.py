@@ -112,7 +112,8 @@ def _alert_table() -> None:
         color = CLASS_COLORS.get(val, "#888")
         return f"color: {color}; font-weight: bold"
 
-    styled = df_show.style.map(_color_class, subset=["pred_class"] if "pred_class" in df_show.columns else [])
+    subset = ["pred_class"] if "pred_class" in df_show.columns else []
+    styled = df_show.style.map(_color_class, subset=subset)
     st.dataframe(styled, use_container_width=True, height=400)
 
 

@@ -5,12 +5,10 @@ from __future__ import annotations
 import numpy as np
 import pandas as pd
 import plotly.express as px
-import plotly.graph_objects as go
 import streamlit as st
 
 from netshield.dashboard import api_client
 from netshield.dashboard.components import (
-    CLASS_COLORS,
     CLASS_ORDER,
     api_down_banner,
     model_badge,
@@ -45,7 +43,8 @@ def render() -> None:
     # Filter by profile
     profiles = sorted({r.get("profile", "unknown") for r in rows})
     if len(profiles) > 1:
-        selected_profile = st.selectbox("Profile", profiles, index=profiles.index("lab") if "lab" in profiles else 0)
+        idx = profiles.index("lab") if "lab" in profiles else 0
+        selected_profile = st.selectbox("Profile", profiles, index=idx)
         rows = [r for r in rows if r.get("profile") == selected_profile]
 
     _results_table(rows)

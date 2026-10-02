@@ -1,6 +1,8 @@
 """Background Kafka consumers for iot.alerts and iot.metrics.
 
 Supports --mock / MOCK_MODE=1 for development without Kafka.
+SCORING_MODE=api enables fallback scoring: the API consumes iot.flows
+and scores with the active ONNX model directly, bypassing Spark.
 """
 
 from __future__ import annotations
@@ -13,7 +15,7 @@ import threading
 import time
 import uuid
 
-from netshield.api.state import LiveState
+from netshield.api.state import LiveState, ModelState
 from netshield.common.labels import CLASS_NAMES
 
 logger = logging.getLogger(__name__)
@@ -21,6 +23,11 @@ logger = logging.getLogger(__name__)
 
 def is_mock_mode() -> bool:
     return os.environ.get("MOCK_MODE", "0") == "1"
+
+
+def scoring_mode() -> str:
+    """Return 'spark' or 'api'. Default 'spark'."""
+    return os.environ.get("SCORING_MODE", "spark").lower()
 
 
 class MockGenerator:
@@ -175,4 +182,102 @@ class KafkaMetricsConsumer:
                 except Exception:
                     logger.warning("Bad metrics message", exc_info=True)
         finally:
+            consumer.close()
+
+
+class KafkaFlowScorer:
+    """Fallback scorer: consume iot.flows, score with ONNX, produce iot.alerts.
+
+    Used when SCORING_MODE=api (Spark streaming is not running).
+    """
+
+    def __init__(
+        self,
+        state: LiveState,
+        model: ModelState,
+        bootstrap: str,
+        flows_topic: str,
+        alerts_topic: str,
+    ) -> None:
+        self._state = state
+        self._model = model
+        self._bootstrap = bootstrap
+        self._flows_topic = flows_topic
+        self._alerts_topic = alerts_topic
+        self._stop = threading.Event()
+        self._thread: threading.Thread | None = None
+
+    def start(self) -> None:
+        self._thread = threading.Thread(
+            target=self._run, daemon=True, name="api-flow-scorer"
+        )
+        self._thread.start()
+        logger.info(
+            "API flow scorer started (%s -> %s)", self._flows_topic, self._alerts_topic
+        )
+
+    def stop(self) -> None:
+        self._stop.set()
+        if self._thread:
+            self._thread.join(timeout=5)
+
+    def _run(self) -> None:
+        from confluent_kafka import Consumer, Producer
+
+        consumer = Consumer({
+            "bootstrap.servers": self._bootstrap,
+            "group.id": "netshield-api-scorer",
+            "auto.offset.reset": "latest",
+        })
+        consumer.subscribe([self._flows_topic])
+
+        producer = Producer({
+            "bootstrap.servers": self._bootstrap,
+            "linger.ms": 5,
+        })
+
+        try:
+            while not self._stop.is_set():
+                msg = consumer.poll(0.5)
+                if msg is None or msg.error():
+                    continue
+                try:
+                    flow = json.loads(msg.value().decode("utf-8"))
+                    features = flow.get("features", {})
+                    result = self._model.predict(features)
+
+                    ts_scored = int(time.time() * 1000)
+                    ts_event = int(flow.get("ts_event", ts_scored))
+
+                    alert = {
+                        "event_id": flow.get("event_id", str(uuid.uuid4())),
+                        "ts_event": ts_event,
+                        "ts_scored": ts_scored,
+                        "latency_ms": float(ts_scored - ts_event),
+                        "org_id": flow.get("org_id", ""),
+                        "device_id": flow.get("device_id", ""),
+                        "pred_class": result["pred_class"],
+                        "confidence": result["confidence"],
+                        "probs": result["probs"],
+                        "is_attack": result["is_attack"],
+                        "true_label": flow.get("true_label"),
+                        "model_version": result["model_version"],
+                    }
+
+                    # Push to live state
+                    self._state.push_alert(alert)
+
+                    # Produce to iot.alerts
+                    alert_out = dict(alert)
+                    alert_out["probs"] = json.dumps(alert_out["probs"])
+                    producer.produce(
+                        self._alerts_topic,
+                        value=json.dumps(alert_out).encode("utf-8"),
+                        key=alert["device_id"].encode("utf-8"),
+                    )
+                    producer.poll(0)
+                except Exception:
+                    logger.warning("Flow scoring error", exc_info=True)
+        finally:
+            producer.flush(5)
             consumer.close()

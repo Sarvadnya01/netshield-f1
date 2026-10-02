@@ -15,8 +15,7 @@ from netshield.common.config import get_config
 from netshield.common.hardware import get_device
 from netshield.common.labels import NUM_CLASSES
 from netshield.federated.client import FLClient
-from netshield.federated.server import run_fl, _evaluate_global
-from netshield.models.evaluate import compute_metrics
+from netshield.federated.server import _evaluate_global, run_fl
 from netshield.models.mlp import MLP
 
 logger = logging.getLogger(__name__)

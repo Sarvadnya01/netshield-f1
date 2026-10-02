@@ -69,4 +69,4 @@ CSVs → Spark batch ETL (Docker, laptop) → Parquet splits + stream holdout
 - [x] P5B Streamlit dashboard
 - [ ] PL2 Integrate lab results
 - [x] P6 Evaluation + report assets
-- [ ] P7 Integration + demo hardening
+- [x] P7 Integration + demo hardening

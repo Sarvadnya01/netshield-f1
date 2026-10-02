@@ -14,7 +14,6 @@ import signal
 import threading
 import time
 import uuid
-from collections import defaultdict
 
 import numpy as np
 import pandas as pd
@@ -113,7 +112,10 @@ class StreamProducer:
         self.feature_names = sorted(
             self.df.select_dtypes(include=[np.number]).columns.tolist()
         )
-        logger.info("Loaded stream data: %d rows, %d features", len(self.df), len(self.feature_names))
+        logger.info(
+            "Loaded stream data: %d rows, %d features",
+            len(self.df), len(self.feature_names),
+        )
 
         # Assign orgs and devices
         self.orgs = [f"org-{i}" for i in range(1, 9)]

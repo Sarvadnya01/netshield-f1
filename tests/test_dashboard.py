@@ -4,8 +4,6 @@ from __future__ import annotations
 
 import os
 
-import pytest
-
 # Ensure mock mode for all tests
 os.environ["MOCK_MODE"] = "1"
 
@@ -26,7 +24,7 @@ def test_components_imports():
 
 
 def test_page_imports():
-    from netshield.dashboard.pages import live_soc, federated_lab, experiments, architecture
+    from netshield.dashboard.pages import architecture, experiments, federated_lab, live_soc
     assert callable(live_soc.render)
     assert callable(federated_lab.render)
     assert callable(experiments.render)

@@ -55,7 +55,9 @@ ALERT_SCHEMA = StructType([
 ])
 
 
-def _load_model_info(serving_dir: str) -> tuple[str, list[str], list[float], list[float], list[str], str]:
+def _load_model_info(
+    serving_dir: str,
+) -> tuple[str, list[str], list[float], list[float], list[str], str]:
     """Load active model info from serving directory.
 
     Returns (onnx_path, feature_names, mean, std, class_names, model_version).
@@ -70,7 +72,10 @@ def _load_model_info(serving_dir: str) -> tuple[str, list[str], list[float], lis
         stats = json.load(f)
 
     from netshield.common.labels import CLASS_NAMES
-    return onnx_path, stats["feature_names"], stats["mean"], stats["std"], CLASS_NAMES, model_version
+    return (
+        onnx_path, stats["feature_names"], stats["mean"],
+        stats["std"], CLASS_NAMES, model_version,
+    )
 
 
 # ---- Global session cache for ONNX (one per Python worker) ----
@@ -82,7 +87,8 @@ def _get_model_info() -> dict:
     global _CACHED_MODEL_INFO
     if _CACHED_MODEL_INFO is None:
         serving_dir = "/workspace/models/serving"
-        onnx_path, feature_names, mean, std, class_names, model_version = _load_model_info(serving_dir)
+        info = _load_model_info(serving_dir)
+        onnx_path, feature_names, mean, std, class_names, model_version = info
         _CACHED_MODEL_INFO = {
             "onnx_path": onnx_path,
             "feature_names": feature_names,
@@ -148,7 +154,7 @@ def main() -> None:
     alerts = flows.mapInPandas(_score_partition, schema=ALERT_SCHEMA)
 
     # Convert to JSON and write to iot.alerts
-    alerts_query = (
+    (
         alerts
         .select(
             F.col("device_id").cast("string").alias("key"),
@@ -203,7 +209,7 @@ def main() -> None:
         )
     )
 
-    metrics_query = (
+    (
         metrics_events
         .select(
             F.col("org_id").cast("string").alias("key"),

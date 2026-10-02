@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import json
 import logging
-from pathlib import Path
 
 from pyspark.sql import DataFrame
 from pyspark.sql import functions as F
@@ -52,11 +51,15 @@ def build_profile(df: DataFrame, stage_counts: dict | None = None) -> dict:
 
     feature_summary = {}
     for col in feature_cols:
+        def _val(suffix: str):
+            v = stats_row[f"{col}__{suffix}"]
+            return float(v) if v is not None else None
+
         feature_summary[col] = {
-            "min": float(stats_row[f"{col}__min"]) if stats_row[f"{col}__min"] is not None else None,
-            "max": float(stats_row[f"{col}__max"]) if stats_row[f"{col}__max"] is not None else None,
-            "mean": float(stats_row[f"{col}__mean"]) if stats_row[f"{col}__mean"] is not None else None,
-            "std": float(stats_row[f"{col}__std"]) if stats_row[f"{col}__std"] is not None else None,
+            "min": _val("min"),
+            "max": _val("max"),
+            "mean": _val("mean"),
+            "std": _val("std"),
             "nulls": int(stats_row[f"{col}__nulls"]),
         }
     profile["feature_summary"] = feature_summary
@@ -81,7 +84,7 @@ def _format_markdown(profile: dict) -> str:
             lines.append(f"| {stage} | {count:,} |")
         lines.append("")
 
-    lines.append(f"## Summary\n")
+    lines.append("## Summary\n")
     lines.append(f"- **Total rows (cleaned):** {profile['total_rows']:,}")
     lines.append(f"- **Features:** {profile['num_features']}")
     lines.append(f"- **8-class labels:** {len(profile['class_8_counts'])}")

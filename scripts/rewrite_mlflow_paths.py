@@ -1,15 +1,16 @@
 """Rewrite artifact roots in mlflow.db from an old repo root to a new one.
 
 Usage:
-  python scripts/rewrite_mlflow_paths.py --db mlflow.db --old-root "C:/old/path" --new-root "C:/new/path"
-  python scripts/rewrite_mlflow_paths.py --db mlflow.db --old-root "C:/old/path" --new-root "C:/new/path" --apply
+  python scripts/rewrite_mlflow_paths.py --db mlflow.db \
+    --old-root "C:/old/path" --new-root "C:/new/path"
+  python scripts/rewrite_mlflow_paths.py --db mlflow.db \
+    --old-root "C:/old/path" --new-root "C:/new/path" --apply
 """
 
 from __future__ import annotations
 
 import argparse
 import sqlite3
-import sys
 
 
 def rewrite_paths(db_path: str, old_root: str, new_root: str, apply: bool = False) -> int:
@@ -103,7 +104,7 @@ def main() -> None:
     )
     args = parser.parse_args()
 
-    print(f"MLflow path rewriter")
+    print("MLflow path rewriter")
     print(f"  DB:       {args.db}")
     print(f"  Old root: {args.old_root}")
     print(f"  New root: {args.new_root}")

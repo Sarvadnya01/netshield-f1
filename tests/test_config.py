@@ -1,8 +1,6 @@
 """Tests for netshield.common.config."""
 
-import os
 
-import pytest
 
 from netshield.common.config import _deep_merge, active_profile, get_config, repo_root
 

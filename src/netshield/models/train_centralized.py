@@ -3,7 +3,8 @@
 Usage:
   python -m netshield.models.train_centralized --model mlp --run-name mlp_smoke
   python -m netshield.models.train_centralized --model xgb --run-name xgb_smoke
-  python -m netshield.models.train_centralized --model mlp --drop-features iat --run-name mlp_no_iat_smoke
+  python -m netshield.models.train_centralized --model mlp \
+    --drop-features iat --run-name mlp_no_iat_smoke
 """
 
 from __future__ import annotations
@@ -13,7 +14,6 @@ import json
 import logging
 import random
 import time
-from pathlib import Path
 
 import numpy as np
 
@@ -68,6 +68,7 @@ def _train_mlp(
 ) -> dict:
     import torch
     from torch.utils.data import DataLoader, TensorDataset
+
     from netshield.common.hardware import get_device
     from netshield.models.mlp import MLP
 

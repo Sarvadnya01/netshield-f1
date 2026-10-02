@@ -10,7 +10,6 @@ import streamlit as st
 
 from netshield.dashboard import api_client
 from netshield.dashboard.components import (
-    CLASS_COLORS,
     CLASS_ORDER,
     api_down_banner,
     model_badge,

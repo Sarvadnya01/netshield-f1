@@ -100,7 +100,6 @@ def _time_one_round(
     """Time a single FL round to estimate ETA for the grid."""
     from netshield.federated.partition import dirichlet_partition
     from netshield.federated.strategies import _build_clients
-    from netshield.federated.server import run_fl
 
     num_clients = fl_cfg.get("num_clients", 8)
     hidden_dims = mlp_cfg.get("hidden_dims", [256, 128, 64])
@@ -356,8 +355,11 @@ def main() -> None:
             "test_macro_f1": test_metrics.get("macro_f1"),
             "test_accuracy": test_metrics.get("accuracy"),
             "test_weighted_f1": test_metrics.get("weighted_f1"),
-            "worst_client_f1": test_metrics.get("worst_client_f1",
-                                                 min(history[-1].get("client_f1s", [0])) if history else None),
+            "worst_client_f1": test_metrics.get(
+                "worst_client_f1",
+                min(history[-1].get("client_f1s", [0]))
+                if history else None,
+            ),
             "wall_time_s": round(wall_time, 1),
         })
 
@@ -384,9 +386,13 @@ def main() -> None:
 def _export_best(best_run: dict, profile: str) -> None:
     """Export the best FL model to ONNX."""
     import torch
+
     from netshield.models.export_onnx import (
-        export_mlp_onnx, verify_parity, benchmark_ort,
-        write_model_card, set_active,
+        benchmark_ort,
+        export_mlp_onnx,
+        set_active,
+        verify_parity,
+        write_model_card,
     )
     from netshield.models.mlp import MLP
 

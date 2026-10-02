@@ -84,7 +84,10 @@ def get_config() -> dict[str, Any]:
         cfg = _deep_merge(cfg, profile_cfg)
         logger.info("Loaded profile: %s (%s)", profile, profile_path)
     else:
-        logger.warning("Profile '%s' not found at %s, using base config only", profile, profile_path)
+        logger.warning(
+            "Profile '%s' not found at %s, using base config only",
+            profile, profile_path,
+        )
 
     # Apply env-var overrides
     cfg = _apply_env_overrides(cfg)

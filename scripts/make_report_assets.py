@@ -10,13 +10,12 @@ Prefers profile="lab" results; falls back to "laptop" (smoke) with a warning.
 from __future__ import annotations
 
 import argparse
-import csv
 import json
 import logging
-import sys
 from pathlib import Path
 
 import matplotlib
+
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
